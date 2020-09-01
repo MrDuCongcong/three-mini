@@ -4,12 +4,13 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const loader = require('sass-loader');
 
 module.exports = {
     // 入口  #/src/index.js
     entry: {
-        index: './index.ts',
-        // app: './src/app.js'
+        app: './src/main.js'
     },
 
     // 出口 #/dist/main.js 
@@ -39,7 +40,8 @@ module.exports = {
 
         compress: true, // 为所有服务设置gzip压缩  
         hot: true, // 开启webpack模块热替换功能
-        
+        open: true, // 自动打开浏览器
+
         // publicPath: '/threejs-demo/',
         /**
          *  以下选项只能通过运行时添加命令参数使用
@@ -47,12 +49,38 @@ module.exports = {
          */
     },
 
+    module: {
+        rules: [
+            {
+                test: /\.vue$/,
+                loader: 'vue-loader',
+            },
+            {
+                test: /\.(scss)|(css)$/,
+                use: [
+                    'vue-style-loader',
+                    'css-loader',
+                    'sass-loader',
+                ]
+            }, 
+            {
+                test: /\.(png)|(jpe?g)/,
+                loader: 'file-loader',
+                options: {
+                    outputPath: 'assets',
+                    name: '[name].[ext]',
+                }
+            }
+        ]
+    },
+
     plugins: [
+        new CleanWebpackPlugin(),
+        new VueLoaderPlugin(),
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: 'index.html',
         }),
-        new CleanWebpackPlugin(),
         // new HtmlWebpackPlugin({
         //     filename: 'app.html',
         //     template: 'index.html',
@@ -60,20 +88,14 @@ module.exports = {
         // })
     ],
 
-    module: {
-        rules: [
-            {
-                test: /\.tsx?/,
-                use: 'ts-loader',
-                exclude: /node_modules/,
-            }
-        ]
-    },
-
     /**
      *  resolve选项用于配置webpack解析的一些规则
      */
     resolve: {
-        extensions: ['.ts', '.tsx', '.js'], // 自动确定解析的扩展名，能够使得用户在引入模块的时候不需要带扩展名
+        extensions: ['.js', '.vue'], // 自动确定解析的扩展名，能够使得用户在引入模块的时候不需要带扩展名
+        alias: {
+            'vue$': 'vue/dist/vue.esm.js',
+            '@': path.resolve(__dirname, '../src'),
+        }
     }
 }

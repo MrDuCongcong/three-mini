@@ -1,6 +1,0 @@
-{
-    "compilerOptions": {
-        "allowJs": true, // 允许编译Javascript文件
-        "jsx": "react", // 在tsx中支持jsx，有三种模式parsever、react、react-native
-    }
-}
